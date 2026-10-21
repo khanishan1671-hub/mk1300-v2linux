@@ -1,0 +1,40 @@
+{
+  "name": "gaming-with-ishan-mk1300",
+  "version": "1.0.0",
+  "description": "Control center for Ant Esports MK1300 V2 keyboard",
+  "main": "src/main.js",
+  "author": "Ishan",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --linux deb --publish never"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.gamingishan.mk1300",
+    "productName": "GamingWithIshan",
+    "extraResources": [
+      { "from": "build/icon.png", "to": "icon.png" },
+      { "from": "build/99-mk1300.rules", "to": "99-mk1300.rules" }
+    ],
+    "linux": {
+      "target": "deb",
+      "category": "Utility",
+      "icon": "build/icon.png",
+      "maintainer": "Ishan <ishan@example.com>",
+      "desktop": {
+        "entry": {
+          "Name": "Gaming With Ishan",
+          "Comment": "Control your MK1300 RGB Keyboard",
+          "Categories": "Utility;"
+        }
+      }
+    },
+    "deb": {
+      "afterInstall": "build/after-install.sh"
+    }
+  }
+}
