@@ -1,0 +1,52 @@
+name: Build and Release .deb
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install librsvg (SVG -> PNG converter)
+        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
+
+      - name: Convert SVG icon to PNG (512x512)
+        run: rsvg-convert -w 512 -h 512 build/icon.svg -o build/icon.png
+
+      - name: Verify icon was created
+        run: ls -la build/
+
+      - name: Install Node dependencies
+        run: npm install
+
+      - name: Make after-install.sh executable
+        run: chmod +x build/after-install.sh
+
+      - name: Build .deb package
+        run: npm run dist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: List built artifacts
+        run: ls -la dist/ || echo "No dist folder"
+
+      - name: Upload .deb to release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*.deb
+          tag_name: ${{ github.ref_name }}
